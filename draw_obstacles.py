@@ -3,11 +3,30 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from scipy import spatial
+import datetime
 
 COORD_PRECISION = 25.0
 
 def usage():
 	print("Usage: python draw_obstacles.py goal_x goal_y")
+
+def export(drawer):
+	timestamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+	filename = "world_obstacles_"+timestamp+".txt"
+	num_obstacles = len(drawer.obs_list)
+	if not num_obstacles:
+		print('No obstacles to export.')
+		return
+	with open(filename, 'w') as file:
+		file.write(str(num_obstacles)+'\n')
+		for i in range(num_obstacles):
+			num_verts = len(drawer.obs_list[i])
+			file.write(str(num_verts)+'\n')
+			for j in range(num_verts):
+				file.write(str(drawer.obs_list[i][j][0])+' '+str(drawer.obs_list[i][j][1])+'\n')
+	print('Wrote', str(num_obstacles), 'obstacles to file', filename)
+
+
 
 class Drawer():
 	def __init__(self, ax):
@@ -83,3 +102,5 @@ if __name__ == "__main__":
 	drawer = Drawer(ax)
 
 	plt.show()
+
+	export(drawer)
