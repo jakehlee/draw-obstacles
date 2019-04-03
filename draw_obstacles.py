@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 
+COORD_PRECISION = 25.0
 
 def usage():
 	print("Usage: python draw_obstacles.py goal_x goal_y")
@@ -27,16 +28,19 @@ class Drawer():
 		round_coord = self.round_coord(raw_coord)
 
 		if self.new_obs:
+			# start new figure
 			self.new_obs = False
 			self.curr_obs = [round_coord]
 			self.curr_line.set_data(np.array(self.curr_obs)[:,0], np.array(self.curr_obs)[:, 1])
 		else:
 			if self.curr_obs[0] == round_coord:
+				# closed figure
 				self.ax.add_patch(matplotlib.patches.Polygon(self.curr_obs, closed=True))
 				self.obs_list.append(self.curr_obs)
 				self.curr_line.set_data([], [])
 				self.new_obs = True
 			else:
+				# continue drawing figure
 				self.curr_obs.append(round_coord)
 				self.curr_line.set_data(np.array(self.curr_obs)[:,0], np.array(self.curr_obs)[:, 1])
 
@@ -46,7 +50,7 @@ class Drawer():
 
 	def round_coord(self, coord):
 		nd = np.array(coord)
-		nd = np.round(nd / 25.0) * 25
+		nd = np.round(nd / COORD_PRECISION) * COORD_PRECISION
 		nd = nd.astype(int)
 		return nd.tolist()
 
