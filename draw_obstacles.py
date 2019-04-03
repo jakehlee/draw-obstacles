@@ -19,6 +19,7 @@ class Drawer():
 
 		self.curr_obs = []
 		self.curr_line,  = self.ax.plot([], [])
+		self.guide_point,  = self.ax.plot([], [], marker='.', color='b')
 
 	def __call__(self, event):
 		print('click', event)
@@ -32,17 +33,19 @@ class Drawer():
 			self.new_obs = False
 			self.curr_obs = [round_coord]
 			self.curr_line.set_data(np.array(self.curr_obs)[:,0], np.array(self.curr_obs)[:, 1])
+			self.guide_point.set_data(round_coord[0], round_coord[1])
 		else:
 			if self.curr_obs[0] == round_coord:
 				# closed figure
+				self.curr_line.set_data([], [])
 				self.ax.add_patch(matplotlib.patches.Polygon(self.curr_obs, closed=True))
 				self.obs_list.append(self.curr_obs)
-				self.curr_line.set_data([], [])
 				self.new_obs = True
 			else:
 				# continue drawing figure
 				self.curr_obs.append(round_coord)
 				self.curr_line.set_data(np.array(self.curr_obs)[:,0], np.array(self.curr_obs)[:, 1])
+				self.guide_point.set_data([], [])
 
 		self.fig.canvas.draw()
 
