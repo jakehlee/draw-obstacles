@@ -2,6 +2,7 @@ import sys, os
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
+from scipy import spatial
 
 COORD_PRECISION = 25.0
 
@@ -22,7 +23,6 @@ class Drawer():
 		self.guide_point,  = self.ax.plot([], [], marker='.', color='b')
 
 	def __call__(self, event):
-		print('click', event)
 		if event.inaxes!=self.ax: return
 
 		raw_coord = [event.xdata, event.ydata]
@@ -38,8 +38,14 @@ class Drawer():
 			if self.curr_obs[0] == round_coord:
 				# closed figure
 				self.curr_line.set_data([], [])
+
+				# enforce convex obstacles
+				self.curr_obs = np.array(self.curr_obs)
+				convex_hull = spatial.ConvexHull(self.curr_obs)
+				self.curr_obs = self.curr_obs[convex_hull.vertices]
+
 				self.ax.add_patch(matplotlib.patches.Polygon(self.curr_obs, closed=True))
-				self.obs_list.append(self.curr_obs)
+				self.obs_list.append(self.curr_obs.tolist())
 				self.new_obs = True
 			else:
 				# continue drawing figure
